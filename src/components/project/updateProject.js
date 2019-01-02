@@ -1,13 +1,66 @@
 import React, { Component } from "react";
-import { getProject } from "../../actions/projectActions";
+import { getProject, createProject } from "../../actions/projectActions";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import classnames from "classnames";
 
 class updateProject extends Component {
+  constructor() {
+    super();
+    this.state = {
+      id: "",
+      projectName: "",
+      projectIdentifier: "",
+      description: "",
+      startDate: "",
+      endDate: ""
+    };
+    this.onChange = this.onChange.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {
+      id,
+      projectName,
+      projectIdentifier,
+      description,
+      startDate,
+      endDate
+    } = nextProps.project;
+
+    this.setState({
+      id,
+      projectName,
+      projectIdentifier,
+      description,
+      startDate,
+      endDate
+    });
+  }
+
   componentDidMount() {
     const { id } = this.props.match.params;
     this.props.getProject(id, this.props.history);
+  }
+
+  onChange(e) {
+    this.setState({ [e.target.name]: e.target.value });
+  }
+
+  onSubmit(e) {
+    e.preventDefault();
+
+    const updateProject = {
+      id: this.state.id,
+      projectName: this.state.projectName,
+      projectIdentifier: this.state.projectIdentifier,
+      description: this.state.description,
+      startDate: this.state.startDate,
+      endDate: this.state.endDate
+    };
+
+    this.props.createProject(updateProject, this.props.history);
   }
 
   render() {
@@ -18,12 +71,15 @@ class updateProject extends Component {
             <div className="col-md-8 m-auto">
               <h5 className="display-4 text-center">Update Project form</h5>
               <hr />
-              <form>
+              <form onSubmit={this.onSubmit}>
                 <div className="form-group">
                   <input
                     type="text"
                     className="form-control form-control-lg "
                     placeholder="Project Name"
+                    name="projectName"
+                    value={this.state.projectName}
+                    onChange={this.onChange}
                   />
                 </div>
                 <div className="form-group">
@@ -31,13 +87,19 @@ class updateProject extends Component {
                     type="text"
                     className="form-control form-control-lg"
                     placeholder="Unique Project ID"
+                    name="projectName"
+                    value={this.state.projectIdentifier}
                     disabled
+                    onChange={this.onChange}
                   />
                 </div>
                 <div className="form-group">
                   <textarea
                     className="form-control form-control-lg"
                     placeholder="Project Description"
+                    name="description"
+                    value={this.state.description}
+                    onChange={this.onChange}
                   />
                 </div>
                 <h6>Start Date</h6>
@@ -45,7 +107,9 @@ class updateProject extends Component {
                   <input
                     type="date"
                     className="form-control form-control-lg"
-                    name="start_date"
+                    name="startDate"
+                    value={this.state.startDate}
+                    onChange={this.onChange}
                   />
                 </div>
                 <h6>Estimated End Date</h6>
@@ -53,7 +117,9 @@ class updateProject extends Component {
                   <input
                     type="date"
                     className="form-control form-control-lg"
-                    name="end_date"
+                    name="endDate"
+                    value={this.state.endDate}
+                    onChange={this.onChange}
                   />
                 </div>
 
@@ -72,6 +138,7 @@ class updateProject extends Component {
 
 updateProject.propTypes = {
   getProject: PropTypes.func.isRequired,
+  createProject: PropTypes.func.isRequired,
   project: PropTypes.func.isRequired
 };
 
@@ -81,5 +148,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getProject }
+  { getProject, createProject }
 )(updateProject);
